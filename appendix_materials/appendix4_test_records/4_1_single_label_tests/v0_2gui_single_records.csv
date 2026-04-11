@@ -1,0 +1,4 @@
+﻿"recorded_at","mode","image_name","ocr_valid","code_valid","ocr_line_count","code_count","success","elapsed_seconds","error"
+"2026-03-31 16:59:38","single","s001.jpg","Yes","Yes","9","1","Yes","0.7155",""
+"2026-03-31 17:47:02","single","success.jpg","Yes","Yes","32","6","Yes","1.2797",""
+"2026-04-01 14:48:07","single","success.jpg","Yes","Yes","32","6","Yes","1.4542",""

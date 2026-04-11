@@ -1,0 +1,11 @@
+﻿recorded_at,image_name,actual_label_count,predicted_label_count,label_count_correct,over_split,over_merge,success,elapsed_seconds,error
+2026-04-09 10:52:57,m001.jpg,3,3,Yes,No,No,Yes,4.1771,
+2026-04-09 11:12:11,m002.png,2,3,No,Yes,No,Yes,4.0295,
+2026-04-09 11:12:14,m003.jpg,4,3,No,No,Yes,Yes,3.4334,
+2026-04-09 11:12:18,m004.jpg,3,3,Yes,No,No,Yes,3.7848,
+2026-04-09 11:12:23,m005.jpg,3,3,Yes,No,No,Yes,4.2965,
+2026-04-09 11:12:26,m006.jpg,3,3,Yes,No,No,Yes,3.5125,
+2026-04-09 11:12:29,m007.jpg,2,2,Yes,No,No,Yes,3.0410,
+2026-04-09 11:12:34,m008.jpg,3,3,Yes,No,No,Yes,4.4402,
+2026-04-09 11:12:38,m009.jpg,4,3,No,No,Yes,Yes,3.8774,
+2026-04-09 11:12:43,m010.jpg,3,3,Yes,No,No,Yes,4.2083,
