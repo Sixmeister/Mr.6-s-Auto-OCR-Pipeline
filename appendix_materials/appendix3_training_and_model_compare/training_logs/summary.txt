@@ -1,0 +1,4 @@
+train_rows=45
+eval_rows=0
+last_loss=1.024462
+last_learning_rate=1e-06

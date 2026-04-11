@@ -1,0 +1,11 @@
+﻿image_name,actual_label_count,label_det_m_80e_pred_count,label_det_m_80e_match,label_det_m_80e_abs_error,label_det_m_45e_pred_count,label_det_m_45e_match,label_det_m_45e_abs_error
+m001.jpg,3,0,0,3,3,1,0
+m002.png,2,0,0,2,3,0,1
+m003.jpg,4,1,0,3,4,1,0
+m004.jpg,3,0,0,3,3,1,0
+m005.jpg,3,0,0,3,4,0,1
+m006.jpg,3,1,0,2,2,0,1
+m007.jpg,2,0,0,2,2,1,0
+m008.jpg,3,0,0,3,3,1,0
+m009.jpg,4,0,0,4,4,1,0
+m010.jpg,3,0,0,3,3,1,0

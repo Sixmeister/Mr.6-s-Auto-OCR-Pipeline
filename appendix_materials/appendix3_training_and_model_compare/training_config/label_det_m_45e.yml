@@ -1,0 +1,45 @@
+_BASE_: [
+  'datasets/voc.yml',
+  'runtime.yml',
+  'ppyoloe/_base_/optimizer_80e.yml',
+  'ppyoloe/_base_/ppyoloe_plus_crn.yml',
+  'ppyoloe/_base_/ppyoloe_plus_reader.yml',
+]
+
+log_iter: 100
+snapshot_epoch: 5
+save_dir: output/label_det_m_45e
+weights: output/label_det_m_45e/model_final
+
+pretrain_weights: https://paddledet.bj.bcebos.com/models/ppyoloe_plus_crn_m_80e_coco.pdparams
+depth_mult: 0.67
+width_mult: 0.75
+use_gpu: True
+
+
+TrainReader:
+  batch_size: 8 # default 8 gpus, total bs = 64
+
+EvalReader:
+  batch_size: 4
+
+
+epoch: 45
+LearningRate:
+  base_lr: 0.001
+  schedulers:
+    - !CosineDecay
+      max_epochs: 45
+    - !LinearWarmup
+      start_factor: 0.
+      epochs: 1
+
+
+PPYOLOEHead:
+  static_assigner_epoch: -1
+  nms:
+    name: MultiClassNMS
+    nms_top_k: 1000
+    keep_top_k: 300
+    score_threshold: 0.01
+    nms_threshold: 0.7
