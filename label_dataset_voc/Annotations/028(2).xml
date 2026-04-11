@@ -1,0 +1,26 @@
+<annotation>
+	<folder>刘工给的数据</folder>
+	<filename>028(2).jpg</filename>
+	<path>E:\Mr.6_Auto_OCR_PipelineWithCodeX\label_dataset_voc\JPEGImages\028(2).jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1706</width>
+		<height>542</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>label</name>
+		<pose>Unspecified</pose>
+		<truncated>1</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>428</xmin>
+			<ymin>269</ymin>
+			<xmax>1101</xmax>
+			<ymax>542</ymax>
+		</bndbox>
+	</object>
+</annotation>
