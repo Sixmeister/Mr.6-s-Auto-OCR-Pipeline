@@ -1,0 +1,11 @@
+﻿image_name,actual_label_count,v0_63_predicted_label_count,v0_71_predicted_label_count,v0_63_label_count_correct,v0_71_label_count_correct,v0_63_elapsed_seconds,v0_71_elapsed_seconds,note
+m001.jpg,3,3,3,Yes,Yes,2.8199,3.6512,both_correct
+m002.png,2,3,2,No,Yes,1.9632,1.5509,v0.71_better
+m003.jpg,4,3,4,No,Yes,3.1218,3.4369,v0.71_better
+m004.jpg,3,3,3,Yes,Yes,2.9554,3.2375,both_correct
+m005.jpg,3,3,5,Yes,No,3.5393,3.7970,v0.71_worse
+m006.jpg,3,3,4,Yes,No,2.5291,3.3357,v0.71_worse
+m007.jpg,2,2,2,Yes,Yes,2.5190,2.6277,both_correct
+m008.jpg,3,3,3,Yes,Yes,3.3079,3.2222,both_correct
+m009.jpg,4,3,4,No,Yes,3.0534,3.2563,v0.71_better
+m010.jpg,3,3,3,Yes,Yes,3.4320,3.2072,both_correct
