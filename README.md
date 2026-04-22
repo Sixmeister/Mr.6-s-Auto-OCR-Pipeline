@@ -1,176 +1,158 @@
 # Mr.6's Auto OCR Pipeline
 
-本项目是一个面向物料标签场景的本地化自动识别系统，用于完成标签区域检测、文字识别、条码/二维码识别以及结构化结果输出。
+`Mr.6's Auto OCR Pipeline` 是一个面向标签类图像场景的本地化自动识别项目，目标是完成标签区域处理、文字识别、条码/二维码识别与结构化结果输出，并逐步发展为可发布、可安装的 Windows 桌面应用。
 
-项目最初从 OCR 与码识别链路验证出发，随后逐步发展为支持多标签场景、标签检测模型接入、GUI 交互、实时监听和正式打包发布的完整系统。当前仓库已经包含从原型脚本到 `v1.0` 正式发布候选版的主要开发成果。
+本仓库保留了项目从原型验证到发布版整理过程中的代表性版本、测试记录整理脚本、附录材料索引以及发布相关资源，适合用于了解项目实现过程、查看阶段成果与获取发布版支持材料。
 
-## Project Overview
+## 项目内容概览
 
-This repository contains a local automatic OCR pipeline for material labels.  
-It supports label-region detection, OCR, barcode/QR decoding, GUI interaction, watch-mode processing, and Windows release packaging.
+仓库当前主要包含以下几类内容：
 
-## 核心功能
+- 多个关键阶段的源码版本
+- 标签检测与多标签场景相关的数据集目录
+- 测试记录与对比分析脚本
+- 项目附录材料整理目录
+- Windows 发布与安装相关脚本
+- 发布版说明资源
 
-- 单张图片识别
-- 实时监听文件夹并自动处理新图片
-- 标签区域检测与多标签分组
-- OCR 文字识别
-- 条码/二维码识别
-- JSON / TXT / 可视化结果输出
-- 手动输出与自动输出两种结果保存模式
-- Windows 便携版与安装包发布流程
+## 代表性版本
 
-## 版本进展概览
+仓库中保留了若干具有代表性的版本脚本，用于展示项目的主要演进路径：
 
-- `v0.1` - `v0.2gui`
-  - 完成 OCR 与码识别原型验证，建立基础 GUI
-- `v0.4` - `v0.5`
-  - 面向多标签场景引入聚类分组与测试记录机制
-- `v0.61` - `v0.63`
-  - 接入标签检测模型，开始使用“先检测标签区域，再识别内容”的路线
-- `v0.7` - `v0.71`
-  - 引入自适应阈值、自适应候选选择和进一步 GUI 优化
-- `v1.0`
-  - 完成发布导向整理、相对路径配置、便携目录、独立运行包和安装器构建流程
+- `auto_ocr_pipeline_v0.1.py`
+  - 早期自动化监听与归档原型
+- `auto_ocr_pipeline_v0.2gui.py`
+  - 引入基础图形界面的版本
+- `auto_ocr_pipeline_v0.4.py`
+  - 多标签问题分析与初步分组思路
+- `auto_ocr_pipeline_v0.5.py`
+  - 聚类分组与规则修正阶段
+- `auto_ocr_pipeline_v0.63.py`
+  - 接入标签检测模型后的阶段性版本
+- `auto_ocr_pipeline_v0.71.py`
+  - 引入自适应策略并继续完善界面
+- `auto_ocr_pipeline_v0.71_tuned.py`
+  - 面向多标签测试场景进一步调优的版本
+- `auto_ocr_pipeline_v1.0.py`
+  - 面向正式发布整理的版本
 
-## 当前推荐版本
+如果你希望优先查看当前最接近最终交付形态的代码，建议从以下文件开始：
 
-当前推荐关注的主版本为：
+- `auto_ocr_pipeline_v1.0.py`
+- `app_config_v1.0.json`
 
-- [auto_ocr_pipeline_v1.0.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/auto_ocr_pipeline_v1.0.py)
-- [app_config_v1.0.json](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/app_config_v1.0.json)
+## 仓库结构说明
 
-如果你只是想直接使用程序，而不是从源码运行，请优先前往 GitHub 的 `Releases` 页面下载安装包。
+### `appendix_materials/`
 
-## 仓库主要结构
+用于整理项目附录类材料，目前包含：
 
-```text
-Mr.6-s-Auto-OCR-Pipeline/
-+-- auto_ocr_pipeline_v0.1.py ~ auto_ocr_pipeline_v1.0.py
-+-- app_config_*.json
-+-- start_release_v1_0.ps1 / .bat
-+-- start_release_v1_0_debug.ps1 / .bat
-+-- prepare_release_v1_0_portable.ps1
-+-- build_release_v1_0_standalone.ps1
-+-- installer_assets/
-+-- release_assets/
-+-- test/
-+-- multiple_labels_test/
-+-- single_label_test/
-+-- label_dataset_voc/
-+-- label_dataset_voc_pd/
-+-- training_logs/
-+-- PaddleDetection-release-2.8.1/
-+-- appendix_materials/
-+-- progress.md
-```
+- `appendix1_code_overview`
+  - 核心代码文件索引与说明
+- `appendix2_dataset_overview`
+  - 数据集结构与样例说明
+- `appendix3_training_and_model_compare`
+  - 训练日志与模型对比材料
+- `appendix4_test_records`
+  - 多阶段测试记录与对比结果
+- `appendix5_release_materials`
+  - 发布版与安装相关说明材料
 
-### 目录说明
+### `installer_assets/`
 
-- `auto_ocr_pipeline_v*.py`
-  - 各阶段主要程序版本
-- `installer_assets/`
-  - Windows 安装器脚本
-- `release_assets/`
-  - 发布包说明文档、打包说明
-- `test/`
-  - 早期原型验证脚本
-- `multiple_labels_test/`
-  - 多标签测试图片与真值表
-- `single_label_test/`
-  - 单标签测试样本
-- `label_dataset_voc/` / `label_dataset_voc_pd/`
-  - 标签检测数据集及其适配后的目录组织
-- `training_logs/`
-  - 标签检测模型训练日志与曲线输出
-- `PaddleDetection-release-2.8.1/`
-  - 检测模型训练、导出与推理依赖框架
+Windows 安装器相关脚本目录，目前主要包含：
+
+- `Mr6_Auto_OCR_Pipeline_v1.0.iss`
+
+该文件可用于通过 Inno Setup 生成 Windows 安装包。
+
+### `label_dataset_voc/`
+
+标签检测相关数据集目录，保留 VOC 风格的数据组织形式，适合查看原始标注与训练数据结构。
+
+### `label_dataset_voc_pd/`
+
+与检测训练流程适配的数据集目录，用于配合检测模型训练或数据整理流程查看。
+
+### `release_assets/`
+
+发布版资源说明目录，目前主要用于存放发布包附带文档，如 README、运行说明等。
+
+### `test/`
+
+保留早期测试与原型验证相关脚本，用于辅助查看项目前期的实验与验证思路。
+
+## 关键脚本说明
+
+### 发布与安装相关
+
+- `prepare_release_v1_0_portable.ps1`
+  - 用于生成便携版发布目录
+- `build_release_v1_0_standalone.ps1`
+  - 用于构建带运行环境的 standalone 发布目录
+- `start_release_v1_0.ps1`
+- `start_release_v1_0.bat`
+  - 正常启动脚本
+- `start_release_v1_0_debug.ps1`
+- `start_release_v1_0_debug.bat`
+  - 调试启动脚本
+
+### 测试与对比相关
+
+- `run_v071_tuned_grouping_test.py`
+  - 批量运行 `v0.71_tuned` 多标签测试
+- `run_v063_grouping_test_retest.py`
+  - 重跑 `v0.63` 同口径测试
+- `evaluate_v071_tuned_counts.py`
+  - 评估 `v0.71_tuned` 标签数判断结果
+- `diagnose_v071_adaptive.py`
+  - 分析自适应策略在测试样本中的表现
+- `build_v063_vs_v071_tuned_compare.py`
+  - 生成 `v0.63` 与 `v0.71_tuned` 的逐图对比表
+
+## 阅读建议
+
+如果你希望快速了解项目实现路线，推荐按以下顺序阅读：
+
+1. `auto_ocr_pipeline_v0.2gui.py`
+2. `auto_ocr_pipeline_v0.5.py`
+3. `auto_ocr_pipeline_v0.63.py`
+4. `auto_ocr_pipeline_v0.71.py`
+5. `auto_ocr_pipeline_v0.71_tuned.py`
+6. `auto_ocr_pipeline_v1.0.py`
+
+如果你更关注测试记录和整理材料，建议优先查看：
+
 - `appendix_materials/`
-  - 论文附录整理材料
-- `progress.md`
-  - 项目开发进度、问题记录与解决过程
+- `build_v063_vs_v071_tuned_compare.py`
+- `run_v071_tuned_grouping_test.py`
 
-## 运行方式
+## 发布版说明
 
-### 1. 从源码运行
+发布相关资源位于：
 
-推荐使用项目中已经验证过的运行环境，例如：
+- `release_assets/Mr6_Auto_OCR_Pipeline_v1.0`
 
-- `ocr_runtime`
+若仅需要使用最终发布版，建议优先从仓库的 Release 页面获取安装包或发布资产。
 
-主发布版启动文件：
+## 开发进展
 
-- [start_release_v1_0.bat](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/start_release_v1_0.bat)
-- [start_release_v1_0.ps1](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/start_release_v1_0.ps1)
+如需查看项目的公开开发脉络与阶段说明，可参考：
 
-调试启动文件：
+- `development_progress.md`
 
-- [start_release_v1_0_debug.bat](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/start_release_v1_0_debug.bat)
-- [start_release_v1_0_debug.ps1](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/start_release_v1_0_debug.ps1)
+该文档主要用于概述项目的阶段演进、版本节点和当前仓库维护状态。
 
-### 2. 下载安装包运行
+## 维护说明
 
-如果你不想配置 Python 环境，建议直接前往 GitHub `Releases` 下载 `v1.0` 安装包。
+当前仓库更偏向于“项目归档 + 版本记录 + 发布支持”的公开整理方式。仓库中既包含可运行源码，也保留了测试记录、附录材料和发布支持文件。
 
-本项目已经完成：
+若后续继续维护，建议进一步补充：
 
-- 便携发布目录构建
-- 自带运行环境的独立运行目录构建
-- Windows 安装器打包
+- 更完整的环境依赖说明
+- Release 更新记录
+- 更标准化的公开文档结构
 
-## 发布与打包相关文件
-
-- [prepare_release_v1_0_portable.ps1](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/prepare_release_v1_0_portable.ps1)
-  - 生成便携发布目录
-- [build_release_v1_0_standalone.ps1](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/build_release_v1_0_standalone.ps1)
-  - 生成自带运行环境的独立运行目录
-- [installer_assets\Mr6_Auto_OCR_Pipeline_v1.0.iss](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/installer_assets/Mr6_Auto_OCR_Pipeline_v1.0.iss)
-  - Inno Setup 安装器脚本
-
-## 标签检测模型训练相关文件
-
-- [start_label_det_45e_training.ps1](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/start_label_det_45e_training.ps1)
-- [monitor_training_log.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/monitor_training_log.py)
-- [compare_three_label_models.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/compare_three_label_models.py)
-- [compare_exported_label_models.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/compare_exported_label_models.py)
-
-## 论文与工程化说明
-
-本仓库同时服务于毕业设计项目开发与论文写作，因此除代码外，还保留了：
-
-- 数据集整理材料
-- 模型训练记录
-- 测试记录
-- 论文附录整理文件
-- 开发进度记录
-
-如果你是老师、同学或评阅者，建议优先阅读：
-
-- [progress.md](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/progress.md)
-- `Releases` 页面中的安装包说明
-
-## 推荐的 GitHub Release 资产
-
-建议在 GitHub `Releases` 页面上传：
-
-- `Mr6_Auto_OCR_Pipeline_v1.0_Setup.exe`
-
-如果需要，也可以同时附上：
-
-- 简短使用说明 PDF
-- 版本更新说明
-
-不建议把以下内容直接作为普通仓库文件长期提交：
-
-- `release_candidates/`
-- `release_installers/`
-- 运行过程中生成的大量 JSON / TXT / 可视化结果
-
-## License
-
-当前仓库尚未单独整理正式开源许可证文件。  
-如果后续准备以更规范的方式公开发布，建议补充 `LICENSE` 文件并明确第三方依赖的使用边界。
-
-## Contact
+## Repository
 
 Repository owner: [Sixmeister](https://github.com/Sixmeister)
