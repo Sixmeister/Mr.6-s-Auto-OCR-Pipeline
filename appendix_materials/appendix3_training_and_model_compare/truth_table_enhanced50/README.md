@@ -1,1 +1,1 @@
-﻿This folder stores the truth table for the 50-image expanded multi-label test set.
+﻿本目录保存 50 张增强多标签测试集对应的统一真值表。

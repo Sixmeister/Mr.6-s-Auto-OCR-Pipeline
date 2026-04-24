@@ -1,1 +1,1 @@
-﻿This folder stores the historical `v0.71_tuned` expanded-set result, the `v0.7_retuned` result, and the corresponding comparison files on the 50-image expanded multi-label test set.
+﻿本目录保存 `v0.71_tuned` 在扩样本条件下的历史结果、`v0.7_retuned` 的新结果，以及相应的对比文件。

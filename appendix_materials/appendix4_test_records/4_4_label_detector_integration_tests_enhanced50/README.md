@@ -1,1 +1,1 @@
-﻿This folder stores the `v0.63` detector-integration result and the `v0.5 vs v0.63` comparison on the 50-image expanded multi-label test set.
+﻿本目录保存 `v0.63` 在 50 张增强多标签测试集上的系统级测试结果，以及 `v0.5 vs v0.63` 的对比结果。

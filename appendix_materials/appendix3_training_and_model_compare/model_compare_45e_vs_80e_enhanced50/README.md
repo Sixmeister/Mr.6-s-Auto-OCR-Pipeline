@@ -1,1 +1,1 @@
-﻿This folder stores the 45-epoch vs 80-epoch detector comparison on the 50-image expanded multi-label test set.
+﻿本目录保存 45 轮与 80 轮标签检测模型在 50 张增强多标签测试集上的逐图比较结果。

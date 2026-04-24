@@ -1,163 +1,163 @@
-﻿# Development Progress
+﻿# 项目开发进展
 
-This document summarizes the public development path of `Mr.6's Auto OCR Pipeline` and highlights the milestones that are most relevant for readers of the repository and the thesis-support materials.
+本文档用于概述 `Mr.6's Auto OCR Pipeline` 的公开开发脉络，并突出展示对仓库读者和论文支撑材料最重要的阶段性结果。
 
-## 1. Project Goal
+## 1. 项目目标
 
-The project aims to build a local automatic label-recognition workflow for label-image scenarios. The core tasks include:
+本项目旨在构建一套面向标签图像场景的本地自动识别流程，核心任务包括：
 
-- label-region detection and separation,
-- OCR text recognition,
-- barcode and QR decoding,
-- multi-label grouping,
-- structured result output,
-- Windows GUI integration and release engineering.
+- 标签区域检测与分离；
+- OCR 文字识别；
+- 条码与二维码识别；
+- 多标签分组；
+- 结果结构化输出；
+- Windows GUI 集成与发布工程化。
 
-## 2. Main Public Development Stages
+## 2. 主要公开开发阶段
 
-### Stage 1. Early OCR and code-recognition prototype
+### 阶段一：早期 OCR 与码识别原型验证
 
-The early prototype verified the basic local OCR and code-recognition chain and established the first automatic processing workflow.
+项目早期主要完成了本地 OCR 与码识别链路的验证，并形成了最初的自动处理流程。
 
-Representative file:
+代表文件：
 
 - `auto_ocr_pipeline_v0.1.py`
 
-### Stage 2. GUI introduction
+### 阶段二：GUI 引入
 
-After the basic recognition chain was verified, a desktop GUI was introduced to support manual testing, path selection, and result inspection.
+在基础识别链路可运行后，项目引入了桌面图形界面，以便进行人工测试、路径配置与结果查看。
 
-Representative file:
+代表文件：
 
 - `auto_ocr_pipeline_v0.2gui.py`
 
-### Stage 3. OCR clustering for multi-label grouping
+### 阶段三：基于 OCR 聚类的多标签分组
 
-As multi-label images became more important, the project introduced grouping based on OCR text-box spatial relations, together with rule-based correction for over-splitting and over-merging.
+随着多标签图像变得重要，项目引入了基于 OCR 文本框空间关系的聚类分组方案，并加入了误拆分、误合并的规则修正逻辑。
 
-Representative files:
+代表文件：
 
 - `auto_ocr_pipeline_v0.4.py`
 - `auto_ocr_pipeline_v0.5.py`
 
-Historical 10-image result:
+历史 10 张测试结果：
 
-- `v0.5`: exact-match `2/10`, MAE not used in the original summary table, average time `1.3482 s`
+- `v0.5`：exact-match `2/10`，原表未单列 MAE，平均耗时 `1.3482 s`
 
-Expanded 50-image result:
+扩样本 50 张测试结果：
 
-- `v0.5`: exact-match `14/50`, MAE `1.2000`, average time `1.4352 s`
+- `v0.5`：exact-match `14/50`，MAE `1.2000`，平均耗时 `1.4352 s`
 
-### Stage 4. Detector-first system integration
+### 阶段四：检测优先的系统集成
 
-The project then moved from “recognize first, group later” to “detect label regions first, then recognize within each region”.
+项目随后从“先识别、后分组”转向“先检测标签区域，再分别识别每个标签区域”。
 
-This stage introduced:
+这一阶段主要引入了：
 
-- detector-first processing,
-- detector-box filtering,
-- clustering fallback when detection is unavailable or insufficient.
+- 检测优先流程；
+- 检测框过滤；
+- 检测不可用时回退到聚类分组。
 
-Representative file:
+代表文件：
 
 - `auto_ocr_pipeline_v0.63.py`
 
-Historical 10-image result:
+历史 10 张测试结果：
 
-- `v0.63`: exact-match `7/10`, MAE `0.3000`
+- `v0.63`：exact-match `7/10`，MAE `0.3000`
 
-Expanded 50-image result:
+扩样本 50 张测试结果：
 
-- `v0.63`: exact-match `36/50`, MAE `0.2800`, average time `2.5564 s`
+- `v0.63`：exact-match `36/50`，MAE `0.2800`，平均耗时 `2.5564 s`
 
-### Stage 5. Historical adaptive candidate-selection branch
+### 阶段五：历史自适应候选策略分支
 
-A later branch explored adaptive candidate selection and tuned filtering rules on the original 10-image multi-label set.
+项目后续曾围绕原始 10 张多标签测试图，对候选框自适应选择与 tuned 规则做过进一步探索。
 
-Representative files:
+代表文件：
 
 - `auto_ocr_pipeline_v0.71.py`
 - `auto_ocr_pipeline_v0.71_tuned.py`
 
-Historical 10-image result:
+历史 10 张测试结果：
 
-- `v0.71_tuned`: exact-match `8/10`, MAE `0.3000`
+- `v0.71_tuned`：exact-match `8/10`，MAE `0.3000`
 
-However, the expanded 50-image validation showed that the earlier small-sample-tuned rules did not generalize stably:
+但扩样本 50 张验证结果显示，原有的小样本 tuned 规则未能稳定泛化：
 
-- `v0.71_tuned` on the 50-image set: exact-match `9/50`, MAE `1.4800`
+- `v0.71_tuned` 在 50 张测试集上：exact-match `9/50`，MAE `1.4800`
 
-This made it inappropriate to present the old tuned branch as the final thesis conclusion for the expanded validation set.
+因此，不再适合将该历史 tuned 分支直接作为扩样本验证后的最终论文结论。
 
-### Stage 6. `v0.7_retuned` candidate-selection optimization branch
+### 阶段六：`v0.7_retuned` 候选框选择优化分支
 
-To preserve the historical `v0.71_tuned` branch while still improving the expanded-set result, a new branch named `v0.7_retuned` was created.
+为了保留历史 `v0.71_tuned` 分支，同时继续提升扩样本结果，项目新建了 `v0.7_retuned` 分支。
 
-This branch focused on:
+该分支重点解决：
 
-- correcting detector integration into the local project root,
-- reducing system-level loss between detector output and final system output,
-- retuning candidate-box filtering and selection for the 50-image expanded set.
+- 检测器接入到本地项目根目录的路径问题；
+- 检测模型输出与系统最终输出之间的系统级损耗；
+- 50 张扩样本条件下的候选框过滤与选择重调优。
 
-Representative file:
+代表文件：
 
 - `auto_ocr_pipeline_v0.7_retuned.py`
 
-Expanded 50-image result:
+扩样本 50 张测试结果：
 
-- `v0.7_retuned`: exact-match `47/50`, MAE `0.0600`, average time `3.4147 s`
+- `v0.7_retuned`：exact-match `47/50`，MAE `0.0600`，平均耗时 `3.4147 s`
 
-Compared with `v0.63` on the same 50-image set:
+与同一测试集上的 `v0.63` 相比：
 
-- `v0.63`: exact-match `36/50`, MAE `0.2800`
-- `v0.7_retuned`: exact-match `47/50`, MAE `0.0600`
+- `v0.63`：exact-match `36/50`，MAE `0.2800`
+- `v0.7_retuned`：exact-match `47/50`，MAE `0.0600`
 
-The main interpretation is not that the system surpassed the detector itself, but that the system-level pipeline was improved until it could preserve the strong counting ability of the 45-epoch detector much more faithfully.
+这一阶段最重要的结论不是“系统超过了检测模型本身”，而是系统集成策略已经被优化到能够更好地保留 45 轮检测模型原有的强计数能力。
 
-### Stage 7. Detector-model comparison and model selection
+### 阶段七：检测模型比较与模型选择
 
-The project also compared multiple exported label-detection models under the same truth table and evaluation logic.
+项目还在统一真值表与统一统计口径下，对多个导出的标签检测模型进行了比较。
 
-Historical 10-image detector comparison:
+历史 10 张测试结果：
 
-- early model: exact-match `0/10`
-- `80e` model: exact-match `0/10`
-- `45e` model: exact-match `7/10`
+- early 模型：exact-match `0/10`
+- `80e` 模型：exact-match `0/10`
+- `45e` 模型：exact-match `7/10`
 
-Expanded 50-image detector comparison:
+扩样本 50 张测试结果：
 
-- early model: exact-match `0/50`, MAE `2.8800`
-- `80e` model: exact-match `0/50`, MAE `2.8200`
-- `45e` model: exact-match `47/50`, MAE `0.0600`
+- early 模型：exact-match `0/50`，MAE `2.8800`
+- `80e` 模型：exact-match `0/50`，MAE `2.8200`
+- `45e` 模型：exact-match `47/50`，MAE `0.0600`
 
-This is why the later system branches continue to use the 45-epoch detector as the core model.
+这也是后续系统版本持续采用 45 轮检测模型作为核心模型的原因。
 
-### Stage 8. Release engineering and `v1.0`
+### 阶段八：发布工程化与 `v1.0`
 
-After the main functional path stabilized, the project moved into release preparation and Windows delivery work.
+在主要识别链路逐步稳定之后，项目进入发布整理阶段，开始面向 Windows 桌面交付进行工程化处理。
 
-Representative file:
+代表文件：
 
 - `auto_ocr_pipeline_v1.0.py`
 
-Public release-related work includes:
+这一阶段主要完成了：
 
-- release directory cleanup,
-- standalone environment preparation,
-- Windows installer generation with Inno Setup,
-- GUI and path cleanup for delivery.
+- 发布目录整理；
+- standalone 运行环境准备；
+- Windows 安装器生成；
+- GUI 与路径配置的发布化调整。
 
-A key successful packaging route was:
+验证成功的打包路径包括：
 
-- cleanup with `build_release_v1_0_standalone.ps1`,
-- path shortening via `subst R:`,
-- Inno Setup compilation from `R:`.
+- 通过 `build_release_v1_0_standalone.ps1` 清理 standalone 环境冗余文件；
+- 使用 `subst R:` 缩短路径；
+- 在缩短后的路径下执行 Inno Setup 编译。
 
-## 3. Public Appendix Materials
+## 3. 公开附录材料
 
-The repository keeps thesis-support materials under `appendix_materials/`.
+公开论文支撑材料统一整理在 `appendix_materials/` 下。
 
-Important folders include:
+重要目录包括：
 
 - `appendix1_code_overview/`
 - `appendix2_dataset_overview/`
@@ -165,7 +165,7 @@ Important folders include:
 - `appendix4_test_records/`
 - `appendix5_release_materials/`
 
-For the thesis revision, the most important new public folders are:
+其中，本轮论文修订新增的关键目录包括：
 
 - `appendix3_training_and_model_compare/model_compare_45e_vs_80e_enhanced50/`
 - `appendix3_training_and_model_compare/model_compare_three_models_enhanced50/`
@@ -174,26 +174,26 @@ For the thesis revision, the most important new public folders are:
 - `appendix4_test_records/4_4_label_detector_integration_tests_enhanced50/`
 - `appendix4_test_records/4_5_candidate_selection_optimization_tests_enhanced50/`
 
-The original 10-image historical materials are still retained alongside the new 50-image materials for traceability.
+历史 10 张测试材料仍与新 50 张材料并列保留，以便追溯项目演进路径。
 
-## 4. Current Public Repository State
+## 4. 当前公开仓库状态
 
-The repository is currently organized as a public archive of:
+当前仓库的公开整理方式主要面向以下用途：
 
-- representative source versions,
-- thesis appendix materials,
-- detector-comparison records,
-- release and installer support files.
+- 代表性源码版本归档；
+- 论文附录材料支撑；
+- 检测模型比较结果公开；
+- 发布与安装资源说明。
 
-The internal local handoff log is not part of the public repository. Public-facing readers should use:
+本地内部接力日志不属于公开仓库内容。公开读者应优先查看：
 
 - `README.md`
 - `development_progress.md`
 - `appendix_materials/`
 
-## 5. Suggested Reading Entry Points
+## 5. 建议阅读入口
 
-Readers who want the shortest route through the repository can start with:
+如果你希望快速了解仓库主要内容，推荐从以下入口开始：
 
 1. `README.md`
 2. `development_progress.md`

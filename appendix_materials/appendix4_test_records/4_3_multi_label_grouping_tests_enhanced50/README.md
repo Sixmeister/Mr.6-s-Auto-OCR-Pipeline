@@ -1,1 +1,1 @@
-﻿This folder stores the `v0.5` grouping-stage result on the 50-image expanded multi-label test set.
+﻿本目录保存 `v0.5` 在 50 张增强多标签测试集上的系统级测试结果。
