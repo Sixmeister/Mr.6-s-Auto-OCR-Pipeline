@@ -1,173 +1,203 @@
-# 项目开发进展
+﻿# Development Progress
 
-本文档用于概述 `Mr.6's Auto OCR Pipeline` 的主要开发脉络、阶段成果与当前仓库状态，便于读者快速了解项目的演进过程。
+This document summarizes the public development path of `Mr.6's Auto OCR Pipeline` and highlights the milestones that are most relevant for readers of the repository and the thesis-support materials.
 
-## 一、项目目标
+## 1. Project Goal
 
-本项目面向标签类图像场景，目标是构建一套可在本地运行的自动识别流程，完成以下任务：
+The project aims to build a local automatic label-recognition workflow for label-image scenarios. The core tasks include:
 
-- 标签区域检测与分组
-- OCR 文字识别
-- 条码/二维码识别
-- 结果结构化输出
-- Windows 桌面端集成与发布
+- label-region detection and separation,
+- OCR text recognition,
+- barcode and QR decoding,
+- multi-label grouping,
+- structured result output,
+- Windows GUI integration and release engineering.
 
-项目从原型验证逐步发展为带图形界面、支持多标签场景、可测试、可发布的完整桌面应用。
+## 2. Main Public Development Stages
 
-## 二、主要开发阶段
+### Stage 1. Early OCR and code-recognition prototype
 
-### 1. 早期原型阶段
+The early prototype verified the basic local OCR and code-recognition chain and established the first automatic processing workflow.
 
-早期版本主要完成基础识别链路验证，包括：
-
-- 图片输入与监控目录处理
-- OCR 基本识别流程
-- 初步结果输出与归档
-
-对应代表版本：
+Representative file:
 
 - `auto_ocr_pipeline_v0.1.py`
 
-### 2. GUI 引入阶段
+### Stage 2. GUI introduction
 
-在完成基础链路验证后，项目加入了桌面图形界面，以便进行人工测试、参数调整与结果查看。此阶段重点是把功能整合到一个可交互的本地工具中。
+After the basic recognition chain was verified, a desktop GUI was introduced to support manual testing, path selection, and result inspection.
 
-对应代表版本：
+Representative file:
 
 - `auto_ocr_pipeline_v0.2gui.py`
 
-### 3. 多标签分组阶段
+### Stage 3. OCR clustering for multi-label grouping
 
-随着多标签图像场景需求增加，项目引入了聚类分组与规则修正策略，用于将同一张图中的多个标签区域进行分离和整理。
+As multi-label images became more important, the project introduced grouping based on OCR text-box spatial relations, together with rule-based correction for over-splitting and over-merging.
 
-这一阶段重点解决：
-
-- 多标签初始聚类
-- 误拆分与误合并问题
-- 分组规则修正
-
-对应代表版本：
+Representative files:
 
 - `auto_ocr_pipeline_v0.4.py`
 - `auto_ocr_pipeline_v0.5.py`
 
-### 4. 标签检测模型接入阶段
+Historical 10-image result:
 
-在聚类分组基础上，项目继续引入标签检测模型，将“检测优先、规则回退”的思路加入主流程，以提升标签区域定位能力和多标签场景表现。
+- `v0.5`: exact-match `2/10`, MAE not used in the original summary table, average time `1.3482 s`
 
-这一阶段的主要变化包括：
+Expanded 50-image result:
 
-- 标签检测模型接入
-- 检测框过滤与排序
-- 检测失败时回退到分组策略
+- `v0.5`: exact-match `14/50`, MAE `1.2000`, average time `1.4352 s`
 
-对应代表版本：
+### Stage 4. Detector-first system integration
+
+The project then moved from “recognize first, group later” to “detect label regions first, then recognize within each region”.
+
+This stage introduced:
+
+- detector-first processing,
+- detector-box filtering,
+- clustering fallback when detection is unavailable or insufficient.
+
+Representative file:
 
 - `auto_ocr_pipeline_v0.63.py`
 
-### 5. 自适应策略优化阶段
+Historical 10-image result:
 
-为改善不同图片条件下的标签数判断效果，项目在后续版本中加入了自适应策略，并围绕多标签测试集进行了进一步调优。
+- `v0.63`: exact-match `7/10`, MAE `0.3000`
 
-此阶段主要工作包括：
+Expanded 50-image result:
 
-- 引入自适应阈值/候选策略
-- 对多标签测试结果进行记录与对比
-- 针对部分误判样本做进一步规则优化
+- `v0.63`: exact-match `36/50`, MAE `0.2800`, average time `2.5564 s`
 
-对应代表版本：
+### Stage 5. Historical adaptive candidate-selection branch
+
+A later branch explored adaptive candidate selection and tuned filtering rules on the original 10-image multi-label set.
+
+Representative files:
 
 - `auto_ocr_pipeline_v0.71.py`
 - `auto_ocr_pipeline_v0.71_tuned.py`
 
-### 6. 工程化发布阶段
+Historical 10-image result:
 
-在功能与测试流程逐步稳定后，项目进入发布整理阶段。该阶段重点是将脚本、配置、模型、运行环境和安装流程组织为可交付的发布版。
+- `v0.71_tuned`: exact-match `8/10`, MAE `0.3000`
 
-主要内容包括：
+However, the expanded 50-image validation showed that the earlier small-sample-tuned rules did not generalize stably:
 
-- 发布目录整理
-- 独立运行环境构建
-- 启动脚本整理
-- 安装器脚本编写
-- Release 材料准备
+- `v0.71_tuned` on the 50-image set: exact-match `9/50`, MAE `1.4800`
 
-对应代表版本：
+This made it inappropriate to present the old tuned branch as the final thesis conclusion for the expanded validation set.
+
+### Stage 6. `v0.7_retuned` candidate-selection optimization branch
+
+To preserve the historical `v0.71_tuned` branch while still improving the expanded-set result, a new branch named `v0.7_retuned` was created.
+
+This branch focused on:
+
+- correcting detector integration into the local project root,
+- reducing system-level loss between detector output and final system output,
+- retuning candidate-box filtering and selection for the 50-image expanded set.
+
+Representative file:
+
+- `auto_ocr_pipeline_v0.7_retuned.py`
+
+Expanded 50-image result:
+
+- `v0.7_retuned`: exact-match `47/50`, MAE `0.0600`, average time `3.4147 s`
+
+Compared with `v0.63` on the same 50-image set:
+
+- `v0.63`: exact-match `36/50`, MAE `0.2800`
+- `v0.7_retuned`: exact-match `47/50`, MAE `0.0600`
+
+The main interpretation is not that the system surpassed the detector itself, but that the system-level pipeline was improved until it could preserve the strong counting ability of the 45-epoch detector much more faithfully.
+
+### Stage 7. Detector-model comparison and model selection
+
+The project also compared multiple exported label-detection models under the same truth table and evaluation logic.
+
+Historical 10-image detector comparison:
+
+- early model: exact-match `0/10`
+- `80e` model: exact-match `0/10`
+- `45e` model: exact-match `7/10`
+
+Expanded 50-image detector comparison:
+
+- early model: exact-match `0/50`, MAE `2.8800`
+- `80e` model: exact-match `0/50`, MAE `2.8200`
+- `45e` model: exact-match `47/50`, MAE `0.0600`
+
+This is why the later system branches continue to use the 45-epoch detector as the core model.
+
+### Stage 8. Release engineering and `v1.0`
+
+After the main functional path stabilized, the project moved into release preparation and Windows delivery work.
+
+Representative file:
 
 - `auto_ocr_pipeline_v1.0.py`
 
-## 三、测试与材料整理
+Public release-related work includes:
 
-仓库中保留了项目开发过程中较为完整的测试与附录材料，主要包括：
+- release directory cleanup,
+- standalone environment preparation,
+- Windows installer generation with Inno Setup,
+- GUI and path cleanup for delivery.
 
-- 数据集结构说明
-- 训练日志与模型对比材料
-- 多标签测试记录
-- 自适应策略相关对比结果
-- 发布版相关说明文档
+A key successful packaging route was:
 
-相关内容已整理到 `appendix_materials/` 目录下，便于结合论文或项目归档材料进行查看。
+- cleanup with `build_release_v1_0_standalone.ps1`,
+- path shortening via `subst R:`,
+- Inno Setup compilation from `R:`.
 
-## 四、当前仓库内容说明
+## 3. Public Appendix Materials
 
-当前仓库保留了两类主要内容：
+The repository keeps thesis-support materials under `appendix_materials/`.
 
-### 1. 版本化源码
+Important folders include:
 
-仓库中保留了多个关键阶段的脚本，用于展示项目从原型到发布版的演进过程。例如：
+- `appendix1_code_overview/`
+- `appendix2_dataset_overview/`
+- `appendix3_training_and_model_compare/`
+- `appendix4_test_records/`
+- `appendix5_release_materials/`
 
-- `auto_ocr_pipeline_v0.1.py`
-- `auto_ocr_pipeline_v0.2gui.py`
-- `auto_ocr_pipeline_v0.5.py`
-- `auto_ocr_pipeline_v0.63.py`
-- `auto_ocr_pipeline_v0.71.py`
-- `auto_ocr_pipeline_v0.71_tuned.py`
-- `auto_ocr_pipeline_v1.0.py`
+For the thesis revision, the most important new public folders are:
 
-### 2. 支撑材料
+- `appendix3_training_and_model_compare/model_compare_45e_vs_80e_enhanced50/`
+- `appendix3_training_and_model_compare/model_compare_three_models_enhanced50/`
+- `appendix3_training_and_model_compare/truth_table_enhanced50/`
+- `appendix4_test_records/4_3_multi_label_grouping_tests_enhanced50/`
+- `appendix4_test_records/4_4_label_detector_integration_tests_enhanced50/`
+- `appendix4_test_records/4_5_candidate_selection_optimization_tests_enhanced50/`
 
-除主程序外，仓库中还包含：
+The original 10-image historical materials are still retained alongside the new 50-image materials for traceability.
 
-- 数据集目录
-- 测试记录脚本
-- 对比分析脚本
-- 发布与安装相关脚本
-- Release 说明资源
+## 4. Current Public Repository State
 
-这些内容共同构成了项目的公开归档与发布支撑体系。
+The repository is currently organized as a public archive of:
 
-## 五、当前阶段
+- representative source versions,
+- thesis appendix materials,
+- detector-comparison records,
+- release and installer support files.
 
-截至当前版本，项目已完成：
-
-- 主要版本源码整理
-- 多标签测试记录归档
-- 自适应策略阶段对比材料整理
-- `v1.0` 发布版主程序整理
-- Windows 发布脚本与安装脚本整理
-
-当前仓库适合用于：
-
-- 查看项目整体演进过程
-- 阅读关键阶段源码
-- 查阅测试记录与附录材料
-- 获取发布版相关资源
-
-## 六、后续维护方向
-
-后续若继续维护，可重点围绕以下方向展开：
-
-- 进一步精简发布环境体积
-- 完善环境配置与依赖说明
-- 持续补充 Release 更新记录
-- 对测试脚本与公开文档做进一步标准化整理
-
-## 七、相关入口
-
-建议优先查看以下文件：
+The internal local handoff log is not part of the public repository. Public-facing readers should use:
 
 - `README.md`
-- `auto_ocr_pipeline_v1.0.py`
+- `development_progress.md`
 - `appendix_materials/`
-- `installer_assets/Mr6_Auto_OCR_Pipeline_v1.0.iss`
-- `release_assets/Mr6_Auto_OCR_Pipeline_v1.0/`
+
+## 5. Suggested Reading Entry Points
+
+Readers who want the shortest route through the repository can start with:
+
+1. `README.md`
+2. `development_progress.md`
+3. `auto_ocr_pipeline_v0.63.py`
+4. `auto_ocr_pipeline_v0.7_retuned.py`
+5. `auto_ocr_pipeline_v1.0.py`
+6. `appendix_materials/`

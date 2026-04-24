@@ -1,158 +1,174 @@
-# Mr.6's Auto OCR Pipeline
+﻿# Mr.6's Auto OCR Pipeline
 
-`Mr.6's Auto OCR Pipeline` 是一个面向标签类图像场景的本地化自动识别项目，目标是完成标签区域处理、文字识别、条码/二维码识别与结构化结果输出，并逐步发展为可发布、可安装的 Windows 桌面应用。
+`Mr.6's Auto OCR Pipeline` is a local automatic recognition system for label-image scenarios. The project focuses on label-region handling, OCR text extraction, barcode/QR decoding, multi-label separation, structured result output, and the final Windows GUI and release engineering workflow.
 
-本仓库保留了项目从原型验证到发布版整理过程中的代表性版本、测试记录整理脚本、附录材料索引以及发布相关资源，适合用于了解项目实现过程、查看阶段成果与获取发布版支持材料。
+This public repository is organized as a presentation-oriented archive of the project. It keeps representative source versions, appendix materials, experiment records, model-comparison outputs, and release-related assets so that readers can understand the implementation path and verify the main thesis results.
 
-## 项目内容概览
+## What Is In This Repository
 
-仓库当前主要包含以下几类内容：
+The repository currently keeps four kinds of public materials:
 
-- 多个关键阶段的源码版本
-- 标签检测与多标签场景相关的数据集目录
-- 测试记录与对比分析脚本
-- 项目附录材料整理目录
-- Windows 发布与安装相关脚本
-- 发布版说明资源
+- Representative source versions from early prototypes to the `v1.0` release branch.
+- Appendix-oriented experiment materials used to support the thesis.
+- Label-detection training and model-comparison outputs.
+- Windows release, packaging, and installer assets.
 
-## 代表性版本
+## Main Version Path
 
-仓库中保留了若干具有代表性的版本脚本，用于展示项目的主要演进路径：
+The most important script versions are:
 
-- `auto_ocr_pipeline_v0.1.py`
-  - 早期自动化监听与归档原型
-- `auto_ocr_pipeline_v0.2gui.py`
-  - 引入基础图形界面的版本
-- `auto_ocr_pipeline_v0.4.py`
-  - 多标签问题分析与初步分组思路
 - `auto_ocr_pipeline_v0.5.py`
-  - 聚类分组与规则修正阶段
+  - OCR clustering and rule-correction stage.
 - `auto_ocr_pipeline_v0.63.py`
-  - 接入标签检测模型后的阶段性版本
+  - Detector-first system with clustering fallback.
 - `auto_ocr_pipeline_v0.71.py`
-  - 引入自适应策略并继续完善界面
+  - Early adaptive candidate-selection stage.
 - `auto_ocr_pipeline_v0.71_tuned.py`
-  - 面向多标签测试场景进一步调优的版本
+  - Historically tuned small-sample branch used on the original 10-image set.
+- `auto_ocr_pipeline_v0.7_retuned.py`
+  - Retuned branch created after the expanded 50-image validation, used to reduce system-level loss between detector output and final system output.
 - `auto_ocr_pipeline_v1.0.py`
-  - 面向正式发布整理的版本
+  - Public release branch prepared for standalone packaging and installer delivery.
 
-如果你希望优先查看当前最接近最终交付形态的代码，建议从以下文件开始：
+If you only want to inspect the final delivery-oriented code path, start with:
 
 - `auto_ocr_pipeline_v1.0.py`
 - `app_config_v1.0.json`
 
-## 仓库结构说明
+## Public Experiment Highlights
 
-### `appendix_materials/`
+### 1. Expanded Multi-Label Validation (`enhanced50`)
 
-用于整理项目附录类材料，目前包含：
+The original multi-label experiments were based on a 10-image set. For the thesis revision, the validation set was expanded to 50 enhanced multi-label images while keeping the original evaluation logic unchanged.
 
-- `appendix1_code_overview`
-  - 核心代码文件索引与说明
-- `appendix2_dataset_overview`
-  - 数据集结构与样例说明
-- `appendix3_training_and_model_compare`
-  - 训练日志与模型对比材料
-- `appendix4_test_records`
-  - 多阶段测试记录与对比结果
-- `appendix5_release_materials`
-  - 发布版与安装相关说明材料
+Key results on the 50-image set are:
 
-### `installer_assets/`
+- `v0.5` system result:
+  - exact-match `14/50`
+  - MAE `1.2000`
+- `v0.63` system result:
+  - exact-match `36/50`
+  - MAE `0.2800`
+- `v0.71_tuned` historical tuned branch on the same 50-image set:
+  - exact-match `9/50`
+  - MAE `1.4800`
+  - shows that the earlier small-sample-tuned rules did not generalize stably
+- `v0.7_retuned` system result:
+  - exact-match `47/50`
+  - MAE `0.0600`
+  - restores the system-level result to the strong counting ability of the 45-epoch detector
 
-Windows 安装器相关脚本目录，目前主要包含：
+### 2. Label-Detector Comparison on the Expanded Set
 
-- `Mr6_Auto_OCR_Pipeline_v1.0.iss`
+The detector-only count comparison on the same 50-image set shows:
 
-该文件可用于通过 Inno Setup 生成 Windows 安装包。
+- `20`-epoch / early detector:
+  - exact-match `0/50`
+  - MAE `2.8800`
+- `80`-epoch detector:
+  - exact-match `0/50`
+  - MAE `2.8200`
+- `45`-epoch detector:
+  - exact-match `47/50`
+  - MAE `0.0600`
 
-### `label_dataset_voc/`
+This is why the later system branches continue to use the 45-epoch detector as the core label-detection model.
 
-标签检测相关数据集目录，保留 VOC 风格的数据组织形式，适合查看原始标注与训练数据结构。
+## Appendix Navigation
 
-### `label_dataset_voc_pd/`
+Public thesis-support materials are organized under `appendix_materials/`.
 
-与检测训练流程适配的数据集目录，用于配合检测模型训练或数据整理流程查看。
+### `appendix_materials/appendix1_code_overview/`
 
-### `release_assets/`
+Index of representative source files and their thesis mapping.
 
-发布版资源说明目录，目前主要用于存放发布包附带文档，如 README、运行说明等。
+### `appendix_materials/appendix2_dataset_overview/`
 
-### `test/`
+Dataset description, structure notes, and examples related to label-detection data preparation.
 
-保留早期测试与原型验证相关脚本，用于辅助查看项目前期的实验与验证思路。
+### `appendix_materials/appendix3_training_and_model_compare/`
 
-## 关键脚本说明
+Training and detector-comparison materials.
 
-### 发布与安装相关
+Important folders include:
 
-- `prepare_release_v1_0_portable.ps1`
-  - 用于生成便携版发布目录
+- `model_compare_45e_vs_80e/`
+  - historical 10-image comparison between the 45-epoch and 80-epoch models.
+- `model_compare_three_models/`
+  - historical 10-image three-model comparison.
+- `model_compare_45e_vs_80e_enhanced50/`
+  - updated 50-image comparison between the 45-epoch and 80-epoch models.
+- `model_compare_three_models_enhanced50/`
+  - updated 50-image comparison among the early detector, 80-epoch detector, and 45-epoch detector.
+- `truth_table/`
+  - historical 10-image truth table.
+- `truth_table_enhanced50/`
+  - 50-image truth table used for the expanded validation.
+
+### `appendix_materials/appendix4_test_records/`
+
+System-level test records and comparison files.
+
+Historical 10-image folders are kept intact:
+
+- `4_3_multi_label_grouping_tests/`
+- `4_4_label_detector_integration_tests/`
+- `4_5_adaptive_threshold_tests/`
+
+Expanded 50-image folders added for the thesis revision are:
+
+- `4_3_multi_label_grouping_tests_enhanced50/`
+  - `v0.5` result on the 50-image set.
+- `4_4_label_detector_integration_tests_enhanced50/`
+  - `v0.63` result and `v0.5 vs v0.63` comparison on the 50-image set.
+- `4_5_candidate_selection_optimization_tests_enhanced50/`
+  - `v0.71_tuned` failure case on the expanded set,
+  - `v0.7_retuned` result,
+  - `v0.63 vs v0.7_retuned` comparison,
+  - truth table and sample list for the expanded set.
+
+### `appendix_materials/appendix5_release_materials/`
+
+Release mapping, release-asset notes, and packaging references.
+
+## Additional Utility Scripts
+
+Several experiment-support scripts are also kept in the repository root for traceability, including:
+
+- `run_v05_grouping_test_enhanced50.py`
+- `run_v063_grouping_test_enhanced50.py`
+- `run_v07_retuned_grouping_test_enhanced50.py`
+- `build_v05_vs_v063_compare_enhanced50.py`
+- `build_v063_vs_v07_retuned_compare_enhanced50.py`
+- `compare_exported_label_models.py`
+- `compare_three_label_models.py`
+
+## Release Materials
+
+The release-oriented branch and packaging resources are still retained in the repository, including:
+
+- `release_assets/`
+- `installer_assets/`
 - `build_release_v1_0_standalone.ps1`
-  - 用于构建带运行环境的 standalone 发布目录
-- `start_release_v1_0.ps1`
-- `start_release_v1_0.bat`
-  - 正常启动脚本
-- `start_release_v1_0_debug.ps1`
-- `start_release_v1_0_debug.bat`
-  - 调试启动脚本
+- `prepare_release_v1_0_portable.ps1`
 
-### 测试与对比相关
+The final successful packaging route used:
 
-- `run_v071_tuned_grouping_test.py`
-  - 批量运行 `v0.71_tuned` 多标签测试
-- `run_v063_grouping_test_retest.py`
-  - 重跑 `v0.63` 同口径测试
-- `evaluate_v071_tuned_counts.py`
-  - 评估 `v0.71_tuned` 标签数判断结果
-- `diagnose_v071_adaptive.py`
-  - 分析自适应策略在测试样本中的表现
-- `build_v063_vs_v071_tuned_compare.py`
-  - 生成 `v0.63` 与 `v0.71_tuned` 的逐图对比表
+- standalone-environment cleanup before packaging,
+- shortened build path via `subst R:`,
+- Inno Setup compilation from the shortened path.
 
-## 阅读建议
+## Reading Order
 
-如果你希望快速了解项目实现路线，推荐按以下顺序阅读：
+For a quick high-level tour, the recommended reading order is:
 
-1. `auto_ocr_pipeline_v0.2gui.py`
+1. `development_progress.md`
 2. `auto_ocr_pipeline_v0.5.py`
 3. `auto_ocr_pipeline_v0.63.py`
-4. `auto_ocr_pipeline_v0.71.py`
-5. `auto_ocr_pipeline_v0.71_tuned.py`
-6. `auto_ocr_pipeline_v1.0.py`
+4. `auto_ocr_pipeline_v0.7_retuned.py`
+5. `auto_ocr_pipeline_v1.0.py`
+6. `appendix_materials/`
 
-如果你更关注测试记录和整理材料，建议优先查看：
-
-- `appendix_materials/`
-- `build_v063_vs_v071_tuned_compare.py`
-- `run_v071_tuned_grouping_test.py`
-
-## 发布版说明
-
-发布相关资源位于：
-
-- `release_assets/Mr6_Auto_OCR_Pipeline_v1.0`
-
-若仅需要使用最终发布版，建议优先从仓库的 Release 页面获取安装包或发布资产。
-
-## 开发进展
-
-如需查看项目的公开开发脉络与阶段说明，可参考：
-
-- `development_progress.md`
-
-该文档主要用于概述项目的阶段演进、版本节点和当前仓库维护状态。
-
-## 维护说明
-
-当前仓库更偏向于“项目归档 + 版本记录 + 发布支持”的公开整理方式。仓库中既包含可运行源码，也保留了测试记录、附录材料和发布支持文件。
-
-若后续继续维护，建议进一步补充：
-
-- 更完整的环境依赖说明
-- Release 更新记录
-- 更标准化的公开文档结构
-
-## Repository
+## Repository Owner
 
 Repository owner: [Sixmeister](https://github.com/Sixmeister)

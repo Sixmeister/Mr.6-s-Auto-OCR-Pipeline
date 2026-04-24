@@ -1,22 +1,17 @@
-﻿## Appendix 3 Training and Model Comparison Overview
+﻿# Appendix 3 Training And Model Compare
 
-This folder is prepared for the thesis appendix section "附录3 训练配置与模型对比补充结果".
+This folder keeps public training notes and detector-comparison materials.
 
-The materials in this directory are organized to support the training and comparison
-statements in Chapter 4 of the thesis. They are grouped into four parts:
+Historical 10-image materials:
 
-- `training_config/`: training configuration files
-- `training_logs/`: raw logs, parsed CSV files, and generated curves
-- `model_compare_45e_vs_80e/`: comparison results between the 45-epoch and 80-epoch models
-- `model_compare_three_models/`: comparison results among the early model, the 80-epoch model, and the 45-epoch model
-- `truth_table/`: the ground-truth table used in the comparison experiments
+- `model_compare_45e_vs_80e/`
+- `model_compare_three_models/`
+- `truth_table/`
 
-Recommended reading order:
+Expanded 50-image materials:
 
-1. `training_config_notes.md`
-2. `model_compare_notes.md`
-3. `training_config/`
-4. `training_logs/`
-5. `model_compare_45e_vs_80e/`
-6. `model_compare_three_models/`
-7. `truth_table/`
+- `model_compare_45e_vs_80e_enhanced50/`
+- `model_compare_three_models_enhanced50/`
+- `truth_table_enhanced50/`
+
+Use the `enhanced50` folders for the revised thesis validation based on the 50-image expanded multi-label set.

@@ -1,0 +1,17 @@
+label_det_m_80e:
+  total_images=50
+  exact_match_images=0
+  exact_match_rate=0.0000
+  mean_abs_error=2.8200
+  over_detect_images=0
+  under_detect_images=50
+
+label_det_m_45e:
+  total_images=50
+  exact_match_images=47
+  exact_match_rate=0.9400
+  mean_abs_error=0.0600
+  over_detect_images=2
+  under_detect_images=1
+
+Conclusion: label_det_m_45e has the higher exact-match rate.
