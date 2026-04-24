@@ -1,17 +1,17 @@
-﻿## Appendix 4 Test Records Overview
+﻿# 附录4 系统测试记录材料
 
-This folder is prepared for the thesis appendix section "附录4 系统测试原始数据与测试记录附表".
+本目录用于保存系统级测试记录与对比结果。
 
-The materials here are organized by testing stage so that the raw records behind the
-summary tables in Chapter 4 can be checked more easily.
+历史 10 张测试集目录仍然保留：
 
-Subfolders:
+- `4_3_multi_label_grouping_tests/`
+- `4_4_label_detector_integration_tests/`
+- `4_5_adaptive_threshold_tests/`
 
-- `4_1_single_label_tests/`: prototype-stage single-label test samples and preserved records
-- `4_2_watch_mode_tests/`: GUI watch-mode test records
-- `4_3_multi_label_grouping_tests/`: multi-label grouping test records based on OCR clustering
-- `4_4_label_detector_integration_tests/`: records after introducing the label detector
-- `4_5_adaptive_threshold_tests/`: records after introducing the adaptive-threshold strategy
+本轮论文修订新增的 50 张测试集目录包括：
 
-The thesis appendix may keep only representative tables and short explanations, while the
-more complete CSV files, sample lists, and comparison records are stored here for reference.
+- `4_3_multi_label_grouping_tests_enhanced50/`
+- `4_4_label_detector_integration_tests_enhanced50/`
+- `4_5_candidate_selection_optimization_tests_enhanced50/`
+
+如需查阅论文修订后的扩样本结果，请优先查看带有 `enhanced50` 后缀的目录。

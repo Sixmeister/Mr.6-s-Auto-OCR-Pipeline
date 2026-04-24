@@ -1,22 +1,17 @@
-﻿## Appendix 3 Training and Model Comparison Overview
+﻿# 附录3 训练与模型比较材料
 
-This folder is prepared for the thesis appendix section "附录3 训练配置与模型对比补充结果".
+本目录用于保存训练说明与标签检测模型比较结果。
 
-The materials in this directory are organized to support the training and comparison
-statements in Chapter 4 of the thesis. They are grouped into four parts:
+历史 10 张测试集材料包括：
 
-- `training_config/`: training configuration files
-- `training_logs/`: raw logs, parsed CSV files, and generated curves
-- `model_compare_45e_vs_80e/`: comparison results between the 45-epoch and 80-epoch models
-- `model_compare_three_models/`: comparison results among the early model, the 80-epoch model, and the 45-epoch model
-- `truth_table/`: the ground-truth table used in the comparison experiments
+- `model_compare_45e_vs_80e/`
+- `model_compare_three_models/`
+- `truth_table/`
 
-Recommended reading order:
+扩样本 50 张测试集材料包括：
 
-1. `training_config_notes.md`
-2. `model_compare_notes.md`
-3. `training_config/`
-4. `training_logs/`
-5. `model_compare_45e_vs_80e/`
-6. `model_compare_three_models/`
-7. `truth_table/`
+- `model_compare_45e_vs_80e_enhanced50/`
+- `model_compare_three_models_enhanced50/`
+- `truth_table_enhanced50/`
+
+如需查阅论文修订后基于 50 张增强多标签测试集的结果，请优先查看带有 `enhanced50` 后缀的目录。

@@ -1,209 +1,174 @@
-# Mr.6's Auto OCR Pipeline
+﻿# Mr.6's Auto OCR Pipeline
 
-`Mr.6's Auto OCR Pipeline` 是一个面向标签图像场景的本地化自动识别项目，目标是完成标签区域处理、文字识别、条码/二维码识别以及结构化结果输出，并逐步发展为可发布、可安装的桌面应用。
+`Mr.6's Auto OCR Pipeline` 是一个面向标签图像场景的本地自动识别系统项目，核心任务包括标签区域处理、OCR 文字识别、条码/二维码识别、多标签分离、结构化结果输出，以及最终的 Windows GUI 与发布工程化。
 
-本仓库同时保留了项目从原型验证到发布版的主要脚本、测试记录整理脚本、附录材料索引以及 Windows 发布相关资源，适合用于了解项目实现过程、复现实验记录和获取最终发布版。
+本公开仓库以“项目展示 + 论文支撑材料归档”为主要目标，保留了项目从原型验证到发布整理过程中的代表性源码版本、附录材料、实验记录、模型比较结果与发布资源，便于读者了解实现路径并复核论文中的主要实验结论。
 
-## 项目特点
+## 仓库主要内容
 
-- 面向标签图像场景的 OCR 流程实现
-- 包含多阶段版本脚本，便于查看功能演进
-- 提供多标签场景的测试与对比脚本
-- 提供发布目录构建、独立运行环境打包和安装器脚本
-- 附带适合论文/项目归档的附录材料整理目录
+当前仓库主要包含四类公开材料：
 
-## 版本概览
+- 从早期原型到 `v1.0` 发布版主线的代表性源码版本。
+- 用于支撑论文的附录型实验材料。
+- 标签检测模型训练与模型比较结果。
+- Windows 发布、打包与安装器相关资源。
 
-仓库保留了若干具有代表性的版本脚本：
+## 主要版本路径
 
-- `auto_ocr_pipeline_v0.1.py`
-  - 自动化监听与结果归档的早期实现
-- `auto_ocr_pipeline_v0.2gui.py`
-  - 引入基础 GUI 的版本
-- `auto_ocr_pipeline_v0.4.py`
-  - 多标签问题分析与初始分组思路
+仓库中较重要的脚本版本包括：
+
 - `auto_ocr_pipeline_v0.5.py`
-  - 多标签聚类分组与规则修正
+  - OCR 聚类分组与规则修正阶段。
 - `auto_ocr_pipeline_v0.63.py`
-  - 标签检测模型接入后的阶段性版本
+  - 检测优先、聚类回退的系统阶段。
 - `auto_ocr_pipeline_v0.71.py`
-  - 自适应策略与进一步界面完善的版本
+  - 早期候选框自适应选择探索阶段。
 - `auto_ocr_pipeline_v0.71_tuned.py`
-  - 针对多标签测试继续调优的策略版本
+  - 基于原始 10 张多标签测试图调优得到的历史 tuned 分支。
+- `auto_ocr_pipeline_v0.7_retuned.py`
+  - 在 50 张扩样本验证后新建的 retuned 分支，用于减少检测模型输出与系统最终输出之间的系统级损耗。
 - `auto_ocr_pipeline_v1.0.py`
-  - 面向正式发布整理的版本
+  - 面向公开发布整理的主线版本。
 
-其中，若你希望优先查看当前最接近最终发布形态的代码，建议从以下文件开始：
+如果你只想优先查看最接近最终交付形态的代码，建议从以下文件开始：
 
-- [auto_ocr_pipeline_v1.0.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/auto_ocr_pipeline_v1.0.py)
-- [app_config_v1.0.json](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/app_config_v1.0.json)
+- `auto_ocr_pipeline_v1.0.py`
+- `app_config_v1.0.json`
 
-## 仓库结构
+## 公开实验重点
 
-当前远端仓库的主要内容如下：
+### 1. 扩充后的多标签验证（`enhanced50`）
 
-```text
-Mr.6-s-Auto-OCR-Pipeline/
-├─ appendix_materials/
-├─ installer_assets/
-├─ label_dataset_voc/
-├─ label_dataset_voc_pd/
-├─ release_assets/
-├─ test/
-├─ app_config_v1.0.json
-├─ auto_ocr_pipeline_v0.1.py
-├─ auto_ocr_pipeline_v0.2gui.py
-├─ auto_ocr_pipeline_v0.2gui_paper.py
-├─ auto_ocr_pipeline_v0.4.py
-├─ auto_ocr_pipeline_v0.5.py
-├─ auto_ocr_pipeline_v0.5_paper.py
-├─ auto_ocr_pipeline_v0.63.py
-├─ auto_ocr_pipeline_v0.63_paper.py
-├─ auto_ocr_pipeline_v0.71.py
-├─ auto_ocr_pipeline_v0.71_tuned.py
-├─ auto_ocr_pipeline_v1.0.py
-├─ build_release_v1_0_standalone.ps1
-├─ build_v063_vs_v071_tuned_compare.py
-├─ diagnose_v071_adaptive.py
-├─ evaluate_v071_tuned_counts.py
-├─ prepare_release_v1_0_portable.ps1
-├─ progress.md
-├─ run_v063_grouping_test_retest.py
-├─ run_v071_tuned_grouping_test.py
-├─ start_release_v1_0.bat
-├─ start_release_v1_0.ps1
-├─ start_release_v1_0_debug.bat
-└─ start_release_v1_0_debug.ps1
-```
+原始多标签实验基于 10 张测试图完成。为配合论文修订，本项目进一步构建了包含 50 张增强多标签图像的测试集，并严格沿用原有评估口径完成扩样本复核。
 
-### 目录说明
+50 张测试集上的关键系统级结果如下：
 
-#### `appendix_materials/`
+- `v0.5`：
+  - exact-match `14/50`
+  - MAE `1.2000`
+- `v0.63`：
+  - exact-match `36/50`
+  - MAE `0.2800`
+- `v0.71_tuned` 历史 tuned 分支：
+  - exact-match `9/50`
+  - MAE `1.4800`
+  - 说明原先在小样本上调出的规则未能稳定泛化到扩样本测试集
+- `v0.7_retuned`：
+  - exact-match `47/50`
+  - MAE `0.0600`
+  - 将系统级结果重新拉回到 45 轮检测模型本身的强计数能力附近
 
-用于整理项目附录型材料，目前包含：
+### 2. 扩样本条件下的标签检测模型比较
 
-- `appendix1_code_overview`
-  - 核心代码文件说明
-- `appendix2_dataset_overview`
-  - 数据集结构与组织说明
-- `appendix3_training_and_model_compare`
-  - 训练相关材料与模型对比记录
-- `appendix4_test_records`
-  - 各阶段测试记录与对比 CSV
-- `appendix5_release_materials`
-  - 发布版脚本与打包材料说明
+在同一套 50 张多标签测试图像上，检测模型本身的计数结果如下：
 
-#### `installer_assets/`
+- `20` 轮 / early 模型：
+  - exact-match `0/50`
+  - MAE `2.8800`
+- `80` 轮模型：
+  - exact-match `0/50`
+  - MAE `2.8200`
+- `45` 轮模型：
+  - exact-match `47/50`
+  - MAE `0.0600`
 
-Windows 安装器相关脚本目录，当前主要包含：
+这也是后续系统分支继续采用 45 轮检测模型作为核心标签检测模型的主要原因。
 
-- `Mr6_Auto_OCR_Pipeline_v1.0.iss`
+## 附录材料导航
 
-该文件可用于 Inno Setup 编译安装包。
+公开论文支撑材料统一整理在 `appendix_materials/` 目录下。
 
-#### `label_dataset_voc/`
+### `appendix_materials/appendix1_code_overview/`
 
-标签检测相关数据集目录，保留了原始 VOC 风格的数据组织形式。
+用于说明代表性源码文件及其与论文正文的对应关系。
 
-#### `label_dataset_voc_pd/`
+### `appendix_materials/appendix2_dataset_overview/`
 
-用于训练/适配框架的数据集组织目录，适合与检测训练流程配合查看。
+用于说明标签检测数据集的结构、样例与整理方式。
 
-#### `release_assets/`
+### `appendix_materials/appendix3_training_and_model_compare/`
 
-发布版说明文档目录。  
-当前包含中英文 README、打包说明等发布资源，可用于最终发布包内文档。
+用于保存训练说明与检测模型比较结果。
 
-#### `test/`
+其中重要目录包括：
 
-保留早期测试与原型验证相关脚本。
+- `model_compare_45e_vs_80e/`
+  - 历史 10 张测试集上的 45 轮与 80 轮模型比较结果。
+- `model_compare_three_models/`
+  - 历史 10 张测试集上的三模型比较结果。
+- `model_compare_45e_vs_80e_enhanced50/`
+  - 50 张扩样本测试集上的 45 轮与 80 轮模型比较结果。
+- `model_compare_three_models_enhanced50/`
+  - 50 张扩样本测试集上的 early / 80e / 45e 三模型比较结果。
+- `truth_table/`
+  - 历史 10 张测试集真值表。
+- `truth_table_enhanced50/`
+  - 50 张扩样本测试集真值表。
 
-## 关键脚本说明
+### `appendix_materials/appendix4_test_records/`
 
-### 运行与发布相关
+用于保存系统级测试记录与对比结果。
 
-- [prepare_release_v1_0_portable.ps1](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/prepare_release_v1_0_portable.ps1)
-  - 生成便携发布目录
-- [build_release_v1_0_standalone.ps1](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/build_release_v1_0_standalone.ps1)
-  - 构建带运行环境的 standalone 发布目录
-- [start_release_v1_0.ps1](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/start_release_v1_0.ps1)
-  - PowerShell 启动脚本
-- [start_release_v1_0.bat](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/start_release_v1_0.bat)
-  - Windows 批处理启动脚本
-- [start_release_v1_0_debug.ps1](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/start_release_v1_0_debug.ps1)
-- [start_release_v1_0_debug.bat](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/start_release_v1_0_debug.bat)
-  - 调试启动脚本
+历史 10 张测试材料仍然保留：
 
-### 测试与对比相关
+- `4_3_multi_label_grouping_tests/`
+- `4_4_label_detector_integration_tests/`
+- `4_5_adaptive_threshold_tests/`
 
-- [run_v071_tuned_grouping_test.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/run_v071_tuned_grouping_test.py)
-  - 运行 `v0.71_tuned` 的批量测试
-- [run_v063_grouping_test_retest.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/run_v063_grouping_test_retest.py)
-  - 重新运行 `v0.63` 的同口径测试
-- [evaluate_v071_tuned_counts.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/evaluate_v071_tuned_counts.py)
-  - 评估 `v0.71_tuned` 的标签数量判断结果
-- [diagnose_v071_adaptive.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/diagnose_v071_adaptive.py)
-  - 用于分析自适应策略行为
-- [build_v063_vs_v071_tuned_compare.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/build_v063_vs_v071_tuned_compare.py)
-  - 生成 `v0.63` 与 `v0.71_tuned` 的逐图对比表
+本轮论文修订新增的 50 张测试材料目录包括：
 
-## 如何使用
+- `4_3_multi_label_grouping_tests_enhanced50/`
+  - `v0.5` 在 50 张测试集上的结果。
+- `4_4_label_detector_integration_tests_enhanced50/`
+  - `v0.63` 在 50 张测试集上的结果，以及 `v0.5 vs v0.63` 对比结果。
+- `4_5_candidate_selection_optimization_tests_enhanced50/`
+  - `v0.71_tuned` 在扩样本上的失稳结果，
+  - `v0.7_retuned` 的新结果，
+  - `v0.63 vs v0.7_retuned` 对比结果，
+  - 以及该测试集对应的真值表与样本清单。
 
-### 1. 查看项目实现
+### `appendix_materials/appendix5_release_materials/`
 
-如果你想快速理解项目实现路线，建议按照以下顺序阅读：
+用于保存发布版映射说明与打包整理支撑材料。
 
-1. `auto_ocr_pipeline_v0.2gui.py`
+## 其他实验脚本
+
+为保证公开可复核性，仓库根目录中还保留了本轮扩样本实验相关脚本，例如：
+
+- `run_v05_grouping_test_enhanced50.py`
+- `run_v063_grouping_test_enhanced50.py`
+- `run_v07_retuned_grouping_test_enhanced50.py`
+- `build_v05_vs_v063_compare_enhanced50.py`
+- `build_v063_vs_v07_retuned_compare_enhanced50.py`
+- `compare_exported_label_models.py`
+- `compare_three_label_models.py`
+
+## 发布材料
+
+仓库中仍保留发布版整理与打包相关资源，包括：
+
+- `release_assets/`
+- `installer_assets/`
+- `build_release_v1_0_standalone.ps1`
+- `prepare_release_v1_0_portable.ps1`
+
+本项目最终验证成功的打包路径包括：
+
+- 打包前清理 standalone 环境冗余文件，
+- 使用 `subst R:` 缩短路径，
+- 从缩短路径后的目录执行 Inno Setup 编译。
+
+## 建议阅读顺序
+
+如果你希望快速了解项目全貌，推荐按以下顺序阅读：
+
+1. `development_progress.md`
 2. `auto_ocr_pipeline_v0.5.py`
 3. `auto_ocr_pipeline_v0.63.py`
-4. `auto_ocr_pipeline_v0.71.py`
-5. `auto_ocr_pipeline_v0.71_tuned.py`
-6. `auto_ocr_pipeline_v1.0.py`
+4. `auto_ocr_pipeline_v0.7_retuned.py`
+5. `auto_ocr_pipeline_v1.0.py`
+6. `appendix_materials/`
 
-### 2. 查看测试与对比材料
-
-建议结合以下目录一起阅读：
-
-- [appendix_materials](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/appendix_materials)
-- [build_v063_vs_v071_tuned_compare.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/build_v063_vs_v071_tuned_compare.py)
-- [run_v071_tuned_grouping_test.py](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/run_v071_tuned_grouping_test.py)
-
-### 3. 构建发布版
-
-如果你希望在本地重建发布流程，推荐顺序如下：
-
-1. 运行 `prepare_release_v1_0_portable.ps1`
-2. 运行 `build_release_v1_0_standalone.ps1`
-3. 使用 Inno Setup 打开 `installer_assets/Mr6_Auto_OCR_Pipeline_v1.0.iss`
-4. 编译新的安装包
-
-## 发布资源
-
-发布版相关文档位于：
-
-- [release_assets/Mr6_Auto_OCR_Pipeline_v1.0](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/release_assets/Mr6_Auto_OCR_Pipeline_v1.0)
-
-如果你是仓库使用者，建议优先从 GitHub Releases 页面获取最终安装包或发布资产，而不是手动拼接中间目录。
-
-## 开发记录
-
-项目的阶段性记录、问题分析和后续补充说明可参考：
-
-- [progress.md](/E:/Mr.6_Auto_OCR_PipelineWithCodeX/progress.md)
-
-这个文件更适合想了解版本推进过程的读者；如果你只关心最终结果，可以直接阅读 `v1.0` 相关脚本与发布目录说明。
-
-## 说明
-
-本仓库当前更偏向“项目归档 + 版本记录 + 发布维护”的公开整理方式。  
-因此，仓库中既有可运行脚本，也有测试对比、附录材料和发布支持文件。
-
-若后续继续公开维护，建议进一步补充：
-
-- `LICENSE`
-- 更明确的环境配置说明
-- Release 页面对应的版本更新日志
-
-## 联系方式
+## 仓库维护者
 
 Repository owner: [Sixmeister](https://github.com/Sixmeister)
