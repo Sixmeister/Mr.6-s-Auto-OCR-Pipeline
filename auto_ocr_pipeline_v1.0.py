@@ -2,8 +2,9 @@
 # v0.5：在不牺牲文字/码识别稳定性的前提下，重点优化多标签分组策略与性能。
 # v0.61：接入 PaddleDetection 训练出的标签检测模型，优先按标签框分配文字/码，提升多标签分割稳定性。
 # v0.62：加入检测框过滤(NMS/面积/TopK) + 按框裁剪OCR，显著提升多标签场景稳定性。
-# v0.7：加入自适应阈值/自适应NMS，多轮尝试后自动选择更接近目标标签数的结果。
+# v0.7：加入候选框自适应选择，多轮尝试后自动选择更接近真实标签结构的结果。
 # v1.0：基于 v0.7 的成熟检测集成版本，完成发布目录整理、相对路径配置和 GUI 发布化优化。
+# 2026-04-28：将 v0.7_retuned 的候选框选择优化同步到发布主线，使发布版与 enhanced50 验证结果保持一致。
 # 本版本默认模型: PaddleDetection-release-2.8.1/output_inference/label_det_m_45e
 
 import sys
@@ -76,16 +77,16 @@ else:
             "txt_output_dir": "output_directory",
             "manual_output": True,
             "label_det_model_dir": "PaddleDetection-release-2.8.1/output_inference/label_det_m_45e",
-            "label_det_score_threshold": 0.3,
+            "label_det_score_threshold": 0.50,
             "label_det_use_gpu": False,
             "label_det_nms_iou": 0.45,
-            "label_det_max_boxes": 6,
-            "label_det_min_area_ratio": 0.02,
-            "label_det_max_area_ratio": 0.9,
+            "label_det_max_boxes": 4,
+            "label_det_min_area_ratio": 0.0005,
+            "label_det_max_area_ratio": 0.98,
             "label_det_crop_margin": 8,
             "label_det_use_crop_ocr": True,
             "label_det_adaptive_enabled": True,
-            "label_det_target_boxes": 3,
+            "label_det_target_boxes": 4,
             "ocr_use_gpu": False,
             "ground_truth_csv": "multiple_labels_test/truth.csv",
             "test_record_csv": "v1_0_grouping_test_records.csv"
@@ -345,8 +346,8 @@ else:
             nmsed = nmsed[:max_boxes]
         return nmsed
 
-    def _filter_label_boxes_with_stats(boxes, img_w, img_h, score_th=0.3, nms_iou=0.45,
-                                       min_area_ratio=0.02, max_area_ratio=0.9, max_boxes=6):
+    def _filter_label_boxes_with_stats(boxes, img_w, img_h, score_th=0.5, nms_iou=0.45,
+                                       min_area_ratio=0.0005, max_area_ratio=0.98, max_boxes=4):
         stats = {
             "input": 0,
             "clamped": 0,
@@ -358,8 +359,6 @@ else:
         if not boxes:
             return [], stats
         stats["input"] = len(boxes)
-        img_area = max(1.0, img_w * img_h)
-
         clamped = []
         for b in boxes:
             cb = _clamp_box(b, img_w, img_h, margin=0)
@@ -369,160 +368,107 @@ else:
         stats["clamped"] = len(clamped)
 
         filtered = [b for b in clamped if b[4] >= score_th]
+        filtered = sorted(filtered, key=lambda x: x[4], reverse=True)
         stats["score"] = len(filtered)
-
-        area_filtered = []
-        for b in filtered:
-            area = _bbox_area(b)
-            ratio = area / img_area
-            if ratio < min_area_ratio or ratio > max_area_ratio:
-                continue
-            area_filtered.append(b)
-        stats["area"] = len(area_filtered)
-
-        nmsed = _nms_boxes(area_filtered, iou_threshold=nms_iou)
-        nmsed = sorted(nmsed, key=lambda b: b[4], reverse=True)
-        if max_boxes and len(nmsed) > max_boxes:
-            nmsed = nmsed[:max_boxes]
-        stats["nms"] = len(nmsed)
-        merged = _merge_redundant_label_boxes(nmsed, max_boxes=max_boxes)
-        stats["merged"] = len(merged)
-        stats["score_sum"] = round(sum(b[4] for b in merged), 4)
-        return merged, stats
-
-    def _merge_redundant_label_boxes(boxes, containment_th=0.72, iou_th=0.35, max_boxes=6):
-        if not boxes:
-            return []
-        merged = []
-        for b in sorted(boxes, key=lambda x: x[4], reverse=True):
-            merged_into_existing = False
-            for idx, cur in enumerate(merged):
-                if _bbox_iou(b, cur) >= iou_th or _bbox_containment(b, cur) >= containment_th:
-                    union_box = [
-                        min(b[0], cur[0]),
-                        min(b[1], cur[1]),
-                        max(b[2], cur[2]),
-                        max(b[3], cur[3]),
-                        max(b[4], cur[4]),
-                    ]
-                    merged[idx] = union_box
-                    merged_into_existing = True
-                    break
-            if not merged_into_existing:
-                merged.append(list(b))
-        merged = sorted(merged, key=lambda x: x[4], reverse=True)
-        if max_boxes and len(merged) > max_boxes:
-            merged = merged[:max_boxes]
-        return merged
+        # enhanced50 验证表明 45e 检测模型在 0.5 阈值附近已经比较忠实地反映标签数量，
+        # 因此发布版主线在这里不再做激进的面积/NMS/合并二次压缩，只做轻量保留。
+        stats["area"] = len(filtered)
+        stats["nms"] = len(filtered)
+        if max_boxes and len(filtered) > max_boxes:
+            filtered = filtered[:max_boxes]
+        stats["merged"] = len(filtered)
+        stats["score_sum"] = round(sum(b[4] for b in filtered), 4)
+        return filtered, stats
 
     def _build_adaptive_profiles(score_th, nms_iou, max_boxes, min_area_ratio, max_area_ratio):
-        profiles = [
+        return [
             {
-                "name": "base",
-                "score_th": score_th,
+                "name": "base_050",
+                "score_th": max(0.50, score_th),
                 "nms_iou": nms_iou,
-                "max_boxes": max_boxes,
-                "min_area_ratio": min_area_ratio,
-                "max_area_ratio": max_area_ratio,
+                "max_boxes": min(4, max_boxes) if max_boxes else 4,
+                "min_area_ratio": 0.0005,
+                "max_area_ratio": 0.98,
             },
             {
-                "name": "recover_more",
-                "score_th": max(0.18, score_th - 0.07),
-                "nms_iou": min(0.90, nms_iou + 0.10),
-                "max_boxes": max_boxes,
-                "min_area_ratio": max(0.0005, min_area_ratio * 0.5),
-                "max_area_ratio": min(0.995, max_area_ratio),
+                "name": "strict_055",
+                "score_th": max(0.55, score_th + 0.05),
+                "nms_iou": nms_iou,
+                "max_boxes": min(4, max_boxes) if max_boxes else 4,
+                "min_area_ratio": 0.0005,
+                "max_area_ratio": 0.98,
             },
             {
-                "name": "recover_sparse",
-                "score_th": max(0.12, score_th - 0.12),
-                "nms_iou": min(0.92, nms_iou + 0.15),
-                "max_boxes": max_boxes,
-                "min_area_ratio": max(0.0005, min_area_ratio * 0.25),
-                "max_area_ratio": min(0.995, max_area_ratio),
+                "name": "recover_045",
+                "score_th": min(0.49, max(0.45, score_th - 0.05)),
+                "nms_iou": nms_iou,
+                "max_boxes": min(4, max_boxes) if max_boxes else 4,
+                "min_area_ratio": 0.0005,
+                "max_area_ratio": 0.98,
+            },
+            {
+                "name": "recover_040",
+                "score_th": min(0.44, max(0.40, score_th - 0.10)),
+                "nms_iou": nms_iou,
+                "max_boxes": min(4, max_boxes) if max_boxes else 4,
+                "min_area_ratio": 0.0005,
+                "max_area_ratio": 0.98,
             },
         ]
-
-        uniq = []
-        seen = set()
-        for p in profiles:
-            key = (
-                round(p["score_th"], 4),
-                round(p["nms_iou"], 4),
-                int(p["max_boxes"]),
-                round(p["min_area_ratio"], 6),
-                round(p["max_area_ratio"], 6),
-            )
-            if key in seen:
-                continue
-            seen.add(key)
-            uniq.append(p)
-        return uniq
-
-    def _candidate_rank(box_count, target_boxes):
-        if box_count == target_boxes:
-            return 4
-        if target_boxes > 1 and box_count == target_boxes - 1:
-            return 3
-        if box_count > 0:
-            return 2
-        return 0
 
     def _select_adaptive_candidate(candidates, target_boxes):
         if not candidates:
             return None
 
-        def sort_key(item):
-            box_count = item["stats"].get("merged", item["stats"].get("nms", 0))
-            return (
-                _candidate_rank(box_count, target_boxes),
-                -abs(box_count - target_boxes),
+        for name in ("base_050", "strict_055", "recover_045", "recover_040"):
+            for item in candidates:
+                if item["profile"]["name"] != name:
+                    continue
+                count = item["stats"].get("merged", 0)
+                if 2 <= count <= 4:
+                    return item
+
+        return max(
+            candidates,
+            key=lambda item: (
+                1 if item["stats"].get("merged", 0) > 0 else 0,
+                item["stats"].get("merged", 0),
                 item["stats"].get("score_sum", 0.0),
                 -item["index"],
-            )
-
-        return max(candidates, key=sort_key)
+            ),
+        )
 
     def _refine_box_count_by_scores(boxes, log_callback=None, log_prefix=""):
-        """
-        Lightweight tail-box refinement for adaptive label detection:
-        - If the 3rd box is much weaker, suppress likely noise (3 -> 2).
-        - If the 4th box is sufficiently confident, keep it (avoid biasing toward target=3).
-        This improves robustness for images whose true label count is 2 or 4.
-        """
         if not boxes:
             return boxes
 
         ordered = sorted(boxes, key=lambda x: x[4], reverse=True)
         scores = [float(b[4]) for b in ordered]
 
-        if len(ordered) == 3:
-            s2, s3 = scores[1], scores[2]
-            if s3 < 0.65 and (s2 - s3) > 0.25:
-                if log_callback:
-                    log_callback(
-                        f"{log_prefix}尾框修正: 第3框置信度偏弱(score3={s3:.2f}, gap23={(s2 - s3):.2f})，3->2"
-                    )
-                return ordered[:2]
+        if len(ordered) <= 2:
+            return ordered
 
-        if len(ordered) >= 4:
+        if len(ordered) == 3:
+            # 发布版同步 retuned 逻辑后，不再激进地将 3 框压成 2 框。
+            return ordered
+
+        if len(ordered) == 4:
             s3, s4 = scores[2], scores[3]
-            if s4 >= 0.58:
-                if log_callback:
-                    log_callback(f"{log_prefix}尾框修正: 第4框置信度可信(score4={s4:.2f})，保留4框")
-                return ordered
-            if (s3 - s4) > 0.30:
+            if s4 < 0.32 and (s3 - s4) > 0.35:
                 if log_callback:
                     log_callback(
-                        f"{log_prefix}尾框修正: 第4框明显偏弱(score4={s4:.2f}, gap34={(s3 - s4):.2f})，截为3框"
+                        f"{log_prefix}尾框修正: 第4框明显偏弱(score4={s4:.2f}, gap34={(s3 - s4):.2f})，4->3"
                     )
                 return ordered[:3]
+            return ordered
 
-        return ordered
+        if log_callback:
+            log_callback(f"{log_prefix}尾框修正: 候选框超过4个，截断到前4个高置信框")
+        return ordered[:4]
 
-    def _detect_label_boxes_adaptive(detector, image_path, img_w, img_h, score_th=0.3, nms_iou=0.45,
-                                     min_area_ratio=0.02, max_area_ratio=0.9, max_boxes=6,
-                                     adaptive_enabled=True, target_boxes=3, log_callback=None, log_prefix=""):
+    def _detect_label_boxes_adaptive(detector, image_path, img_w, img_h, score_th=0.5, nms_iou=0.45,
+                                     min_area_ratio=0.0005, max_area_ratio=0.98, max_boxes=4,
+                                     adaptive_enabled=True, target_boxes=4, log_callback=None, log_prefix=""):
         raw_boxes = _detect_label_boxes(detector, image_path, score_threshold=score_th)
         profiles = _build_adaptive_profiles(score_th, nms_iou, max_boxes, min_area_ratio, max_area_ratio)
         if not adaptive_enabled:
@@ -550,9 +496,7 @@ else:
             if log_callback:
                 log_callback(
                     f"{log_prefix}自适应[{profile['name']}]: score={profile['score_th']:.2f} "
-                    f"nms={profile['nms_iou']:.2f} max={profile['max_boxes']} "
-                    f"-> raw={stats['input']} score={stats['score']} area={stats['area']} "
-                    f"nms={stats['nms']} merged={stats['merged']}"
+                    f"max={profile['max_boxes']} -> raw={stats['input']} kept={stats['merged']}"
                 )
 
         chosen = _select_adaptive_candidate(candidates, target_boxes)

@@ -1,4 +1,4 @@
-﻿# Mr.6's Auto OCR Pipeline
+# Mr.6's Auto OCR Pipeline
 
 `Mr.6's Auto OCR Pipeline` 是一个面向标签图像场景的本地自动识别系统项目，核心任务包括标签区域处理、OCR 文字识别、条码/二维码识别、多标签分离、结构化结果输出，以及最终的 Windows GUI 与发布工程化。
 
@@ -28,7 +28,7 @@
 - `auto_ocr_pipeline_v0.7_retuned.py`
   - 在 50 张扩样本验证后新建的 retuned 分支，用于减少检测模型输出与系统最终输出之间的系统级损耗。
 - `auto_ocr_pipeline_v1.0.py`
-  - 面向公开发布整理的主线版本。
+  - 面向公开发布整理的主线版本，现已同步 `v0.7_retuned` 的候选框选择优化逻辑。
 
 如果你只想优先查看最接近最终交付形态的代码，建议从以下文件开始：
 
@@ -52,11 +52,11 @@
 - `v0.71_tuned` 历史 tuned 分支：
   - exact-match `9/50`
   - MAE `1.4800`
-  - 说明原先在小样本上调出的规则未能稳定泛化到扩样本测试集
+  - 说明原先在小样本上调出的规则未能稳定泛化到扩样本测试集。
 - `v0.7_retuned`：
   - exact-match `47/50`
   - MAE `0.0600`
-  - 将系统级结果重新拉回到 45 轮检测模型本身的强计数能力附近
+  - 将系统级结果重新拉回到 45 轮检测模型本身的强计数能力附近。
 
 ### 2. 扩样本条件下的标签检测模型比较
 
@@ -122,41 +122,32 @@
 - `4_4_label_detector_integration_tests_enhanced50/`
   - `v0.63` 在 50 张测试集上的结果，以及 `v0.5 vs v0.63` 对比结果。
 - `4_5_candidate_selection_optimization_tests_enhanced50/`
-  - `v0.71_tuned` 在扩样本上的失稳结果，
-  - `v0.7_retuned` 的新结果，
-  - `v0.63 vs v0.7_retuned` 对比结果，
+  - `v0.71_tuned` 在扩样本上的失稳结果。
+  - `v0.7_retuned` 的新结果。
+  - `v0.63 vs v0.7_retuned` 对比结果。
   - 以及该测试集对应的真值表与样本清单。
 
 ### `appendix_materials/appendix5_release_materials/`
 
 用于保存发布版映射说明与打包整理支撑材料。
 
-## 其他实验脚本
-
-为保证公开可复核性，仓库根目录中还保留了本轮扩样本实验相关脚本，例如：
-
-- `run_v05_grouping_test_enhanced50.py`
-- `run_v063_grouping_test_enhanced50.py`
-- `run_v07_retuned_grouping_test_enhanced50.py`
-- `build_v05_vs_v063_compare_enhanced50.py`
-- `build_v063_vs_v07_retuned_compare_enhanced50.py`
-- `compare_exported_label_models.py`
-- `compare_three_label_models.py`
-
 ## 发布材料
 
-仓库中仍保留发布版整理与打包相关资源，包括：
+仓库中保留了发布版整理与打包相关资源，包括：
 
 - `release_assets/`
 - `installer_assets/`
-- `build_release_v1_0_standalone.ps1`
 - `prepare_release_v1_0_portable.ps1`
+- `build_release_v1_0_standalone.ps1`
+- `prepare_release_v1_0_retuned_portable.ps1`
+- `build_release_v1_0_retuned_standalone.ps1`
+- `installer_assets/Mr6_Auto_OCR_Pipeline_v1.0_retuned.iss`
 
-本项目最终验证成功的打包路径包括：
+其中，`v1.0 retuned` 路线已经把 `v0.7_retuned` 的候选框选择优化逻辑同步回发布主线，并按下列经验成功完成重新打包：
 
-- 打包前清理 standalone 环境冗余文件，
-- 使用 `subst R:` 缩短路径，
-- 从缩短路径后的目录执行 Inno Setup 编译。
+- 打包前清理 standalone 环境冗余文件；
+- 使用 `subst R:` 缩短路径；
+- 从缩短路径后的 standalone 目录执行 Inno Setup 编译。
 
 ## 建议阅读顺序
 

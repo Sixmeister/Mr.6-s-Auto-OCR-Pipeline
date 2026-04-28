@@ -1,4 +1,4 @@
-﻿# 项目开发进展
+# 项目开发进展
 
 本文档用于概述 `Mr.6's Auto OCR Pipeline` 的公开开发脉络，并突出展示对仓库读者和论文支撑材料最重要的阶段性结果。
 
@@ -139,19 +139,23 @@
 代表文件：
 
 - `auto_ocr_pipeline_v1.0.py`
+- `app_config_v1.0.json`
 
 这一阶段主要完成了：
 
 - 发布目录整理；
 - standalone 运行环境准备；
 - Windows 安装器生成；
-- GUI 与路径配置的发布化调整。
+- GUI 与路径配置的发布化调整；
+- 将 `v0.7_retuned` 的候选框选择优化逻辑同步回 `v1.0` 发布主线；
+- 基于平行的 retuned 打包脚本重新生成 standalone 压缩包与安装器。
 
 验证成功的打包路径包括：
 
-- 通过 `build_release_v1_0_standalone.ps1` 清理 standalone 环境冗余文件；
+- 通过 `build_release_v1_0_standalone.ps1` 或 `build_release_v1_0_retuned_standalone.ps1` 清理并生成 standalone 目录；
 - 使用 `subst R:` 缩短路径；
-- 在缩短后的路径下执行 Inno Setup 编译。
+- 在缩短后的路径下执行 Inno Setup 编译；
+- 生成新的 `v1.0 retuned` 安装包与 standalone 压缩包。
 
 ## 3. 公开附录材料
 
